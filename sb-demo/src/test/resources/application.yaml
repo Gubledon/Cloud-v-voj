@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: sb-demo
+  sql:
+    init:
+      mode: never
+
+app:
+  hello:
+    greeting: Hello
+  current-account:
+    transaction:
+      get-latest-current-account-transactions-max-record-count: 20

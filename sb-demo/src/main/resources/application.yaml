@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: sb-demo
+  datasource:
+    url: jdbc:h2:mem:fmfi
+  jpa:
+    defer-datasource-initialization: true
+
+app:
+  hello:
+    greeting: Ahoj
+  current-account:
+    transaction:
+      get-latest-current-account-transactions-max-record-count: 20
