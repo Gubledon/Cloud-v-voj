@@ -1,12 +1,12 @@
 # Cloud-v-voj
 
-Tento repozitar obsahuje projekty z predmetu Cloud Computing, rozdelene po semestri. Kazdy projekt sa nachadza vo vlastnom adresari.
+Tento repozitár obsahuje projekty z predmetu Vývoj natívnych aplikácií pre Cloud, rozdelené po semestri. Každý projekt sa nachádza vo vlastnom adresári.
 
-## Struktura
+## Štruktúra
 
-- `sb-demo/` — Spring Boot demo aplikacia
+- `sb-demo/` — Spring Boot demo aplikácia
 
-## Dolezite
+## Dôležité
 
-- **Pri odovzdavani vzdy odovzdavajte iba prislusny priecinok** daneho zadania, nie cely repozitar.
-- **Nikdy neodovzdavajte subor `CLAUDE.md`** — ten sluzi len na lokalnu konfiguraciu a nema sa dostat do odovzdaneho riesenia.
+- **Pri odovzdávaní vždy odovzdávajte iba príslušný priečinok** daného zadania, nie celý repozitár.
+- **Nikdy neodovzdávajte súbor `CLAUDE.md`** — ten slúži len na lokálnu konfiguráciu a nemá sa dostať do odovzdaného riešenia.
