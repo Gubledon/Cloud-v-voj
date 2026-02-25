@@ -6,9 +6,26 @@ spring:
   jpa:
     defer-datasource-initialization: true
 
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  info:
+    java:
+      enabled: true
+
 app:
   hello:
     greeting: Ahoj
   current-account:
     transaction:
       get-latest-current-account-transactions-max-record-count: 20
+  integration:
+    fees:
+      base-uri: http://localhost:1080
+      username: dummy
+      password: dummy

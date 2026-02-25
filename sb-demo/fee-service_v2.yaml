@@ -1,0 +1,73 @@
+
+openapi: 3.0.3
+info:
+  title: fee-service API
+  version: 1.0.0-SNAPSHOT
+security:
+  - BasicAuth: []
+paths:
+  /fee:
+    get:
+      tags:
+        - Fee Resource
+      parameters:
+        - name: acno
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    post:
+      tags:
+        - Fee Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeeDTO'
+      responses:
+        "200":
+          description: OK
+  /greeting:
+    get:
+      tags:
+        - Advanced Greeting
+      parameters:
+        - name: subject
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /hello:
+    get:
+      tags:
+        - Greeting Resource
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    FeeDTO:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        acno:
+          type: string
+        transactionAmount:
+          type: number
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

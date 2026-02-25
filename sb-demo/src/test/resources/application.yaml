@@ -11,3 +11,8 @@ app:
   current-account:
     transaction:
       get-latest-current-account-transactions-max-record-count: 20
+  integration:
+    fees:
+      base-uri: http://localhost:1080
+      username: dummy
+      password: dummy
