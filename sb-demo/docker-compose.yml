@@ -1,0 +1,71 @@
+version: '3.4'
+
+services:
+
+  java-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: java-build
+    command: ["echo", "Build stage only"]
+    networks:
+      - cloud-network
+
+  java:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: java
+    environment:
+      - SPRING_PROFILES_ACTIVE=postgres2
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres2:5432/cloud
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres1
+      - postgres2
+    networks:
+      - cloud-network
+
+  postgres1:
+    image: postgres:16
+    container_name: postgres1
+    environment:
+      POSTGRES_DB: cloud
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres1_data:/var/lib/postgresql/data
+    networks:
+      - cloud-network
+
+  postgres2:
+    build:
+      context: .
+      dockerfile: docker/postgresql/Postgres.Dockerfile
+    container_name: postgres2
+    environment:
+      POSTGRES_DB: cloud
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres2_data:/var/lib/postgresql/data
+    networks:
+      - cloud-network
+
+volumes:
+  postgres1_data:
+  postgres2_data:
+
+networks:
+  cloud-network:
+
+
+

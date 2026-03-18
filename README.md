@@ -5,8 +5,3 @@ Tento repozitár obsahuje projekty z predmetu Vývoj natívnych aplikácií pre 
 ## Štruktúra
 
 - `sb-demo/` — Spring Boot demo aplikácia
-
-## Dôležité
-
-- **Pri odovzdávaní vždy odovzdávajte iba príslušný priečinok** daného zadania, nie celý repozitár.
-- **Nikdy neodovzdávajte súbor `CLAUDE.md`** — ten slúži len na lokálnu konfiguráciu a nemá sa dostať do odovzdaného riešenia.

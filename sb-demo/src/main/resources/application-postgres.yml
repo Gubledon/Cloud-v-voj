@@ -1,0 +1,31 @@
+app:
+  hello:
+    greeting: Ahoj
+  current-account:
+    transaction:
+      get-latest-current-account-transactions-max-record-count: 20
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cloud
+    username: user
+    password: password
+
+
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  info:
+    java:
+      enabled: true

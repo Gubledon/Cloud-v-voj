@@ -1,0 +1,24 @@
+app:
+  hello:
+    greeting: Ahoj
+  current-account:
+    transaction:
+      get-latest-current-account-transactions-max-record-count: 20
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/cvicenie_docker?currentSchema=cvicenie_docker
+    username: cvicenie_docker
+    password: cvicenie_docker
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  info:
+    java:
+      enabled: true
