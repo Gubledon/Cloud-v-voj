@@ -1,81 +1,105 @@
 # fee-service
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+Quarkus mikroslužba pre správu poplatkov (fees). Poskytuje REST API na vytváranie a získavanie poplatkov s podporou Docker a Kubernetes nasadenia vrátane GraalVM natívnej kompilácie.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+## Technológie
 
-## Running the application in dev mode
+- Quarkus 3.34.1
+- Java 21
+- Hibernate ORM Panache
+- H2 databáza (in-memory pre dev/test, externá pre prod)
+- RESTEasy + Jackson
+- Swagger UI
+- Basic autentifikácia (Elytron Security)
+- Docker + Kubernetes + GraalVM (Mandrel)
 
-You can run your application in dev mode that enables live coding using:
+## Spustenie v dev móde
 
-```shell script
+```shell
 ./mvnw quarkus:dev
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+Dev UI je dostupné na http://localhost:8080/q/dev/
 
-## Packaging and running the application
+## Build a Docker
 
-The application can be packaged using:
+```shell
+# Build produkčného artefaktu
+./mvnw clean package -DskipTests
 
-```shell script
-./mvnw package
+# Build s Docker image
+./mvnw clean package -DskipTests -Dquarkus.container-image.build=true
+
+# Spustenie externej H2 DB
+docker run -d -p 9092:9092 -p 8082:8082 -v "$PWD/h2_data:/h2-data" --name=H2Instance thomseno/h2
+
+# Spustenie fee-service kontajnera
+docker run -p 8084:8080 \
+  -e "minimal_fee_limit=10000" \
+  -e "db_url=jdbc:h2:tcp://host.docker.internal:9092/test" \
+  -e "db_username=sa" \
+  -e "user_password=admin-password" \
+  fmfi/fee-service
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+Aplikácia bude dostupná na http://localhost:8084
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+## Kubernetes nasadenie
 
-If you want to build an _über-jar_, execute the following command:
+```shell
+# Vytvorenie ConfigMap a Secret
+kubectl apply -f app-configmap.yml
+kubectl apply -f app-secret.yml
 
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+# Build + deploy na K8s (JVM mód)
+./mvnw package -DskipTests \
+  -Dquarkus.container-image.build=true \
+  -Dquarkus.kubernetes.deploy=true
+
+# Build + deploy na K8s (natívny GraalVM mód)
+./mvnw clean package -Pnative -DskipTests \
+  -Dquarkus.native.container-build=true \
+  -Dquarkus.container-image.build=true \
+  -Dquarkus.kubernetes.deploy=true \
+  -Dquarkus.native.builder-image=quay.io/quarkus/ubi9-quarkus-mandrel-builder-image:jdk-25
+
+# Overenie stavu
+kubectl get pods
+kubectl get svc
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+### K8s konfigurácia
 
-## Creating a native executable
+- **Service type:** LoadBalancer na porte 8084
+- **Repliky:** 2
+- **Health probes:** liveness (5s) + readiness (10s) cez SmallRye Health
+- **ConfigMap (`app-configmap.yml`):** `db_url`, `db_username`, `minimal_fee_limit`
+- **Secret (`app-secret.yml`):** `user_password` (base64)
 
-You can create a native executable using:
+### Prerekvizity pre K8s API
 
-```shell script
-./mvnw package -Dnative
+Pred deployom je potrebné nastaviť env premenné pre Kubernetes API TLS:
+
+```shell
+export CLIENT_CERT_DATA=<client-certificate-data z ~/.kube/config>
+export CLIENT_CERT_KEY=<client-key-data z ~/.kube/config>
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+## REST API
 
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
+| Metóda | Endpoint | Auth | Popis |
+|--------|----------|------|-------|
+| GET | `/fee` | user | Zoznam všetkých poplatkov |
+| GET | `/fee?iban={iban}` | user | Poplatky pre daný IBAN |
+| POST | `/fee` | admin | Vytvorenie nového poplatku |
+| GET | `/hello` | - | Hello world |
+| GET | `/q/health` | - | Health check |
+| GET | `/q/swagger-ui` | - | Swagger UI |
+
+## Natívna kompilácia
+
+```shell
+./mvnw package -Pnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/fee-service-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code for Hibernate ORM via the active record or the repository pattern
-- ArC ([guide](https://quarkus.io/guides/cdi-reference)): Build time CDI dependency injection
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes with Swagger UI
-- JDBC Driver - H2 ([guide](https://quarkus.io/guides/datasource)): Connect to the H2 database via JDBC
-- Elytron Security Properties File ([guide](https://quarkus.io/guides/security-properties)): Secure your applications using properties files
-- RESTEasy Classic ([guide](https://quarkus.io/guides/resteasy)): REST endpoint framework implementing Jakarta REST and more
-
-## Provided Code
-
-### Hibernate ORM
-
-Create your first JPA entity
-
-[Related guide section...](https://quarkus.io/guides/hibernate-orm)
-
-
-[Related Hibernate with Panache section...](https://quarkus.io/guides/hibernate-orm-panache)
-
-
-### RESTEasy JAX-RS
-
-Easily start your RESTful Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started#the-jax-rs-resources)
+Výsledný natívny executable: `./target/fee-service-1.0.0-SNAPSHOT-runner`
